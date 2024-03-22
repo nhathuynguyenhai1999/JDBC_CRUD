@@ -11,10 +11,21 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>User List</title>
+    <title>User Management</title>
 </head>
 <body>
-<h1>User List</h1>
+<h1>User Management</h1>
+<form action="UserServlet" method="GET">
+    <label for="searchCountry">Search by Country:</label>
+    <input type="text" id="searchCountry" name="country">
+    <input type="submit" value="Search">
+</form>
+
+<form action="UserServlet" method="GET">
+    <input type="hidden" name="sortBy" value="name">
+    <input type="submit" value="Sort by Name">
+</form>
+
 <table border="1">
     <tr>
         <th>ID</th>
@@ -22,7 +33,6 @@
         <th>Email</th>
         <th>Country</th>
     </tr>
-    <jsp:useBean id="users" scope="request" type="java.util.List"/>
     <c:forEach var="user" items="${users}">
         <tr>
             <td>${user.id}</td>
@@ -34,4 +44,5 @@
 </table>
 </body>
 </html>
+
 

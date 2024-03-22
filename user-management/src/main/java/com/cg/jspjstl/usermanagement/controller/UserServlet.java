@@ -36,6 +36,10 @@ public class UserServlet extends HttpServlet {
                 case "edit":
                     updateUser(request, response);
                     break;
+                case "search":
+                    searchUsersByCountry(request,response);
+                case "sort":
+                    sortUsersByName(request,response);
             }
         } catch (SQLException ex) {
             throw new ServletException(ex);
@@ -73,7 +77,7 @@ public class UserServlet extends HttpServlet {
             throws SQLException, IOException, ServletException {
         List<User> listUser = userDAO.selectAllUsers();
         request.setAttribute("listUser", listUser);
-        RequestDispatcher dispatcher = request.getRequestDispatcher("list-users.jsp");
+        RequestDispatcher dispatcher = request.getRequestDispatcher("list.jsp");
         dispatcher.forward(request, response);
     }
 
@@ -134,6 +138,19 @@ public class UserServlet extends HttpServlet {
         dispatcher.forward(request, response);
     }
     private void getAllUsersSortedByName(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        List<User> users = userDAO.getAllUsersSortedByName();
+        request.setAttribute("users", users);
+        RequestDispatcher dispatcher = request.getRequestDispatcher("list-users.jsp");
+        dispatcher.forward(request, response);
+    }
+    private void searchUsersByCountry(HttpServletRequest request,HttpServletResponse response) throws ServletException,IOException{
+        String country = request.getParameter("country");
+        List<User> users = userDAO.searchUsersByCountry(country);
+        request.setAttribute("users",users);
+        RequestDispatcher dispatcher = request.getRequestDispatcher("list-users.jsp");
+        dispatcher.forward(request,response);
+    }
+    private void sortUsersByName(HttpServletRequest request,HttpServletResponse response) throws ServletException,IOException{
         List<User> users = userDAO.getAllUsersSortedByName();
         request.setAttribute("users", users);
         RequestDispatcher dispatcher = request.getRequestDispatcher("list-users.jsp");
