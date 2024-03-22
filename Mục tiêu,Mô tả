@@ -1,0 +1,10 @@
+Luyện tập sử dụng JDBC
+Xây dựng ứng dụng WEB quản lý User bao gồm các chức năng sau:
+
+Hiển thị danh sách User
+
+Thêm mới User
+
+Sửa thông tin User
+
+Xoá User
