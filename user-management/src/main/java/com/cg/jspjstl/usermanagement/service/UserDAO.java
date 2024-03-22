@@ -17,19 +17,20 @@ public class UserDAO implements IUserDAO {
     public UserDAO() {
     }
 
-    protected Connection getConnection() {
-        Connection connection = null;
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-            String jdbcURL = "jdbc:mysql://localhost:3306/demo?useSSL=false";
-            String jdbcUsername = "root";
-            String jdbcPassword = "123456";
-            connection = DriverManager.getConnection(jdbcURL, jdbcUsername, jdbcPassword);
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
+        protected Connection getConnection() {
+            Connection connection = null;
+            try {
+                Class.forName("com.mysql.jdbc.Driver");
+                String jdbcURL = "jdbc:mysql://localhost:3306/user_management?allowPublicKeyRetrieval=true&useSSL=false";
+                String jdbcUsername = "root";
+                String jdbcPassword = "0848101999";
+                connection = DriverManager.getConnection(jdbcURL, jdbcUsername, jdbcPassword);
+            } catch (SQLException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+            return connection;
         }
-        return connection;
-    }
+
 
     @Override
     public void insertUser(User user) throws SQLException {
@@ -66,6 +67,23 @@ public class UserDAO implements IUserDAO {
     public List<User> selectAllUsers() {
         List<User> users = new ArrayList<>();
         return getUsers(users, SELECT_ALL_USERS);
+    }
+
+    private List<User> getUsers(List<User> users, String selectAllUsers) {
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(selectAllUsers);
+             ResultSet rs = preparedStatement.executeQuery()) {
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String name = rs.getString("name");
+                String email = rs.getString("email");
+                String country = rs.getString("country");
+                users.add(new User(id, name, email, country));
+            }
+        } catch (SQLException e) {
+            printSQLException(e);
+        }
+        return users;
     }
 
     public boolean deleteUser(int id) throws SQLException {
@@ -153,7 +171,9 @@ public class UserDAO implements IUserDAO {
         return getUsers(users, SELECT_ALL_USERS_SORTED_BY_NAME);
     }
 
-    private List<User> getUsers(List<User> users, String SELECT_ALL_USERS_SORTED_BY_NAME) {
+    private List<User> getUsers() {
+        List<User> users = new ArrayList<>();
+        String SELECT_ALL_USERS_SORTED_BY_NAME = "SELECT * FROM users ORDER BY name";
         try (Connection connection = getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ALL_USERS_SORTED_BY_NAME)) {
             ResultSet rs = preparedStatement.executeQuery();
@@ -169,6 +189,5 @@ public class UserDAO implements IUserDAO {
         }
         return users;
     }
-
 }
 
