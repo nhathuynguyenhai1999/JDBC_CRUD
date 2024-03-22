@@ -65,21 +65,7 @@ public class UserDAO implements IUserDAO {
 
     public List<User> selectAllUsers() {
         List<User> users = new ArrayList<>();
-        try (Connection connection = getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ALL_USERS)) {
-            ResultSet rs = preparedStatement.executeQuery();
-
-            while (rs.next()) {
-                int id = rs.getInt("id");
-                String name = rs.getString("name");
-                String email = rs.getString("email");
-                String country = rs.getString("country");
-                users.add(new User(id, name, email, country));
-            }
-        } catch (SQLException e) {
-            printSQLException(e);
-        }
-        return users;
+        return getUsers(users, SELECT_ALL_USERS);
     }
 
     public boolean deleteUser(int id) throws SQLException {
@@ -106,6 +92,26 @@ public class UserDAO implements IUserDAO {
         return rowUpdated;
     }
 
+    @Override
+    public List<User> getAllUsers() {
+        List<User> users = new ArrayList<>();
+        String SELECT_ALL_USERS_SQL = "SELECT * FROM users";
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ALL_USERS_SQL)) {
+            ResultSet rs = preparedStatement.executeQuery();
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String name = rs.getString("name");
+                String email = rs.getString("email");
+                String country = rs.getString("country");
+                users.add(new User(id, name, email, country));
+            }
+        } catch (SQLException e) {
+            printSQLException(e);
+        }
+        return users;
+    }
+
     private void printSQLException(SQLException ex) {
         for (Throwable e : ex) {
             if (e instanceof SQLException) {
@@ -121,5 +127,48 @@ public class UserDAO implements IUserDAO {
             }
         }
     }
+    public List<User> searchUsersByCountry(String country) {
+        List<User> users = new ArrayList<>();
+        String SEARCH_USERS_BY_COUNTRY_SQL = "SELECT * FROM users WHERE country LIKE ?";
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(SEARCH_USERS_BY_COUNTRY_SQL)) {
+            preparedStatement.setString(1, "%" + country + "%");
+            ResultSet rs = preparedStatement.executeQuery();
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String name = rs.getString("name");
+                String email = rs.getString("email");
+                String userCountry = rs.getString("country");
+                users.add(new User(id, name, email, userCountry));
+            }
+        } catch (SQLException e) {
+            printSQLException(e);
+        }
+        return users;
+    }
+
+    public List<User> getAllUsersSortedByName() {
+        List<User> users = new ArrayList<>();
+        String SELECT_ALL_USERS_SORTED_BY_NAME = "SELECT * FROM users ORDER BY name";
+        return getUsers(users, SELECT_ALL_USERS_SORTED_BY_NAME);
+    }
+
+    private List<User> getUsers(List<User> users, String SELECT_ALL_USERS_SORTED_BY_NAME) {
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ALL_USERS_SORTED_BY_NAME)) {
+            ResultSet rs = preparedStatement.executeQuery();
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String name = rs.getString("name");
+                String email = rs.getString("email");
+                String country = rs.getString("country");
+                users.add(new User(id, name, email, country));
+            }
+        } catch (SQLException e) {
+            printSQLException(e);
+        }
+        return users;
+    }
+
 }
 
